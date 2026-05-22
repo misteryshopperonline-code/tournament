@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tómbola de Equipos</title>
+<style>
+*{box-sizing:border-box;}
+body{
+  font-family:Arial,sans-serif;
+  margin:0;
+  padding:20px;
+  color:white;
+  min-height:100vh;
+  transition:background 0.4s ease;
+}
+body.futbol{background:linear-gradient(135deg,#14532d,#16a34a);}
+body.volley{background:linear-gradient(135deg,#7c2d12,#ea580c);}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  background:rgba(255,255,255,0.1);
+  padding:25px;
+  border-radius:20px;
+  backdrop-filter:blur(10px);
+}
+
+h1{
+  text-align:center;
+  margin-top:0;
+  font-size:28px;
+  letter-spacing:0.5px;
+}
+
+/* Sport tabs */
+.sport-tabs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:25px;
+}
+
+.tab-btn{
+  padding:12px 30px;
+  border:2px solid rgba(255,255,255,0.4);
+  border-radius:50px;
+  font-size:17px;
+  cursor:pointer;
+  font-weight:bold;
+  background:rgba(255,255,255,0.12);
+  color:white;
+  transition:all 0.25s;
+}
+.tab-btn:hover{background:rgba(255,255,255,0.25);}
+.tab-btn.active{
+  background:white;
+  border-color:white;
+}
+body.futbol .tab-btn.active{color:#14532d;}
+body.volley .tab-btn.active{color:#7c2d12;}
+
+/* Sport badge */
+.sport-badge{
+  display:inline-block;
+  background:rgba(255,255,255,0.2);
+  border:1px solid rgba(255,255,255,0.35);
+  border-radius:8px;
+  padding:4px 12px;
+  font-size:13px;
+  font-weight:bold;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+
+textarea{
+  width:100%;
+  height:160px;
+  padding:15px;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+  color:#1f2937;
+  resize:vertical;
+}
+
+.buttons{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+
+button{
+  padding:14px 22px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:opacity 0.2s;
+}
+button:disabled{opacity:0.5;cursor:not-allowed;}
+
+.draw-btn{background:rgba(255,255,255,0.92);}
+body.futbol .draw-btn{color:#14532d;}
+body.volley .draw-btn{color:#7c2d12;}
+
+.reset-btn{
+  background:rgba(255,255,255,0.15);
+  color:white;
+  border:2px solid rgba(255,255,255,0.35);
+}
+
+.result{
+  margin-top:25px;
+  text-align:center;
+  font-size:28px;
+  font-weight:bold;
+  min-height:40px;
+}
+
+.teams{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-top:30px;
+}
+
+.team{
+  border-radius:16px;
+  padding:20px;
+  transition:background 0.4s;
+}
+body.futbol .team{background:rgba(21,128,61,0.35);border:1px solid rgba(74,222,128,0.3);}
+body.volley .team{background:rgba(194,65,12,0.35);border:1px solid rgba(251,146,60,0.3);}
+
+.team h2{
+  margin-top:0;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.team-count{
+  font-size:13px;
+  background:rgba(255,255,255,0.2);
+  border-radius:20px;
+  padding:2px 10px;
+  font-weight:normal;
+  margin-left:auto;
+}
+
+ul{list-style:none;padding:0;margin:0;}
+
+li{
+  background:rgba(255,255,255,0.15);
+  padding:10px 14px;
+  margin-bottom:8px;
+  border-radius:10px;
+  text-align:center;
+  font-weight:500;
+  animation:slideIn 0.3s ease;
+}
+
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(-8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.empty-msg{
+  color:rgba(255,255,255,0.45);
+  font-size:14px;
+  text-align:center;
+  padding:15px 0;
+}
+
+@media(max-width:700px){
+  .teams{grid-template-columns:1fr;}
+  h1{font-size:22px;}
+  .tab-btn{padding:10px 20px;font-size:15px;}
+}
+</style>
+</head>
+<body class="futbol">
+
+<div class="container">
+  <h1 id="main-title">⚽ Tómbola de Equipos</h1>
+
+  <div class="sport-tabs">
+    <button class="tab-btn active" data-sport="futbol" onclick="setSport('futbol')">⚽ Fútbol</button>
+    <button class="tab-btn" data-sport="volley" onclick="setSport('volley')">🏐 Volley</button>
+  </div>
+
+  <div class="sport-badge" id="sport-badge">⚽ FÚTBOL</div>
+
+  <textarea id="players">Ro
+Mia
+Luciana
+Sofi
+Isa
+Mauri
+Edu
+Nico
+Leidy
+Isabell
+Mari</textarea>
+
+  <div class="buttons">
+    <button class="draw-btn" id="draw-btn" onclick="drawTeams()">🎲 Sortear Equipos</button>
+    <button class="reset-btn" id="reset-btn" onclick="resetTeams()">🔄 Reiniciar</button>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="teams">
+    <div class="team">
+      <h2 id="team1-title">⚽ Equipo 1 <span class="team-count" id="count1">0</span></h2>
+      <ul id="team1"><li class="empty-msg">Sin jugadores</li></ul>
+    </div>
+    <div class="team">
+      <h2 id="team2-title">⚽ Equipo 2 <span class="team-count" id="count2">0</span></h2>
+      <ul id="team2"><li class="empty-msg">Sin jugadores</li></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const sports = {
+  futbol: {
+    emoji: '⚽',
+    label: 'FÚTBOL',
+    defaultPlayers: `Ro\nMia\nLuciana\nSofi\nIsa\nMauri\nEdu\nNico\nLeidy\nIsabell\nMari`,
+    players: `Ro\nMia\nLuciana\nSofi\nIsa\nMauri\nEdu\nNico\nLeidy\nIsabell\nMari`,
+    team1: [],
+    team2: []
+  },
+  volley: {
+    emoji: '🏐',
+    label: 'VOLLEY',
+    defaultPlayers: ``,
+    players: ``,
+    team1: [],
+    team2: []
+  }
+};
+
+let currentSport = 'futbol';
+let drawing = false;
+
+function setSport(sport) {
+  if (drawing) return;
+
+  // Save current textarea value to state
+  sports[currentSport].players = document.getElementById('players').value;
+
+  currentSport = sport;
+  const s = sports[sport];
+
+  // Update body theme class
+  document.body.className = sport;
+
+  // Update active tab
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.sport === sport);
+  });
+
+  // Update titles and badge
+  document.getElementById('main-title').textContent = s.emoji + ' Tómbola de Equipos';
+  document.getElementById('sport-badge').textContent = s.emoji + ' ' + s.label;
+  document.getElementById('team1-title').innerHTML = s.emoji + ' Equipo 1 <span class="team-count" id="count1">' + s.team1.length + '</span>';
+  document.getElementById('team2-title').innerHTML = s.emoji + ' Equipo 2 <span class="team-count" id="count2">' + s.team2.length + '</span>';
+
+  // Restore player list
+  document.getElementById('players').value = s.players;
+
+  // Clear result and render saved teams
+  document.getElementById('result').innerHTML = '';
+  renderTeams(s.team1, s.team2);
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+async function drawTeams() {
+  if (drawing) return;
+  drawing = true;
+
+  const drawBtn = document.getElementById('draw-btn');
+  const resetBtn = document.getElementById('reset-btn');
+  drawBtn.disabled = true;
+  resetBtn.disabled = true;
+
+  const s = sports[currentSport];
+  const playersText = document.getElementById('players').value;
+
+  let players = playersText
+    .split('\n')
+    .map(name => name.trim())
+    .filter(name => name !== '');
+
+  if (players.length === 0) {
+    document.getElementById('result').innerHTML = '⚠️ Ingresa jugadores primero';
+    drawing = false;
+    drawBtn.disabled = false;
+    resetBtn.disabled = false;
+    return;
+  }
+
+  players = shuffle(players);
+
+  s.team1 = [];
+  s.team2 = [];
+
+  renderTeams(s.team1, s.team2);
+
+  for (let i = 0; i < players.length; i++) {
+    await new Promise(resolve => setTimeout(resolve, 700));
+
+    const player = players[i];
+
+    if (s.team1.length <= s.team2.length) {
+      s.team1.push(player);
+    } else {
+      s.team2.push(player);
+    }
+
+    renderTeams(s.team1, s.team2);
+    document.getElementById('result').innerHTML = s.emoji + ' ' + player + ' fue asignado';
+  }
+
+  document.getElementById('result').innerHTML = '🏆 ¡Equipos listos!';
+  drawing = false;
+  drawBtn.disabled = false;
+  resetBtn.disabled = false;
+}
+
+function renderTeams(team1, team2) {
+  const s = sports[currentSport];
+  const team1List = document.getElementById('team1');
+  const team2List = document.getElementById('team2');
+
+  team1List.innerHTML = '';
+  team2List.innerHTML = '';
+
+  if (team1.length === 0) {
+    team1List.innerHTML = '<li class="empty-msg">Sin jugadores</li>';
+  } else {
+    team1.forEach(player => {
+      const li = document.createElement('li');
+      li.textContent = player;
+      team1List.appendChild(li);
+    });
+  }
+
+  if (team2.length === 0) {
+    team2List.innerHTML = '<li class="empty-msg">Sin jugadores</li>';
+  } else {
+    team2.forEach(player => {
+      const li = document.createElement('li');
+      li.textContent = player;
+      team2List.appendChild(li);
+    });
+  }
+
+  // Update counts
+  const count1 = document.getElementById('count1');
+  const count2 = document.getElementById('count2');
+  if (count1) count1.textContent = team1.length;
+  if (count2) count2.textContent = team2.length;
+}
+
+function resetTeams() {
+  if (drawing) return;
+  const s = sports[currentSport];
+  s.team1 = [];
+  s.team2 = [];
+  document.getElementById('result').innerHTML = '';
+  renderTeams(s.team1, s.team2);
+}
+</script>
+</body>
+</html>
